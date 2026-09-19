@@ -7,13 +7,16 @@ export default function StaffCalendar() {
   const [staffNotes, setStaffNotes] = useState({});
   const [editingDate, setEditingDate] = useState(null);
   const [editValue, setEditValue] = useState("");
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+
   const [hoveredRow, setHoveredRow] = useState(null);
   const rowRefs = useRef({});
 
   useEffect(() => {
     fetchMasterCalendar();
-    listenToStaffNotes();
+    const unsubscribe = listenToStaffNotes();
+    return unsubscribe;
   }, []);
 
   // Auto-scroll effect to land on the current date
@@ -44,20 +47,23 @@ export default function StaffCalendar() {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        const daysArray = data.map || []; 
+        const daysArray = data.map || [];
         setCalendarDays(daysArray);
       }
     } catch (error) {
       console.error("Error fetching master calendar:", error);
+      setLoadError("Unable to load the calendar. Please refresh the page.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const listenToStaffNotes = () => {
     const notesRef = collection(dbNotes, "configNotes");
-    onSnapshot(notesRef, (snapshot) => {
+    return onSnapshot(notesRef, (snapshot) => {
       const notesMap = {};
       snapshot.forEach((doc) => {
-        notesMap[doc.id] = doc.data().noteText; 
+        notesMap[doc.id] = doc.data().noteText;
       });
       setStaffNotes(notesMap);
     });
@@ -109,10 +115,18 @@ export default function StaffCalendar() {
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", margin: 0, padding: 0, fontFamily: "system-ui, -apple-system, sans-serif", backgroundColor: "#f0f2f5" }}>
       
       <div style={{ padding: "20px 40px", backgroundColor: "#fff", borderBottom: "1px solid #ddd", boxShadow: "0 2px 4px rgba(0,0,0,0.04)", zIndex: 10 }}>
-        <h1 style={{ margin: 0, fontSize: "24px", color: "#1a1a1a" }}>Staff Dashboard: 2026-2027</h1>
+        <h1 style={{ margin: 0, fontSize: "24px", color: "#1a1a1a" }}>UAIS Staff Calendar: 2026-2027</h1>
       </div>
       
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 40px" }}>
+        {loadError && (
+          <div style={{ padding: "16px 20px", marginBottom: "16px", backgroundColor: "#fdf3f4", color: "#b02a37", borderRadius: "8px", border: "1px solid #f1c2c7" }}>
+            {loadError}
+          </div>
+        )}
+        {isLoading ? (
+          <div style={{ padding: "40px", textAlign: "center", color: "#586069" }}>Loading calendar…</div>
+        ) : (
         <div style={{ backgroundColor: "#fff", borderRadius: "8px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", border: "1px solid #e1e4e8" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
             <thead style={{ position: "sticky", top: 0, backgroundColor: "#f8f9fa", borderBottom: "2px solid #dee2e6", zIndex: 5 }}>
@@ -124,14 +138,14 @@ export default function StaffCalendar() {
               </tr>
             </thead>
             <tbody>
-              {calendarDays.map((day, index) => {
+              {calendarDays.map((day) => {
                 const currentNote = staffNotes[day.fecha] || "";
                 const isEditing = editingDate === day.fecha;
                 const isHovering = hoveredRow === day.fecha;
 
                 return (
-                  <tr 
-                    key={index} 
+                  <tr
+                    key={day.fecha}
                     ref={(el) => (rowRefs.current[day.fecha] = el)}
                     onMouseEnter={() => setHoveredRow(day.fecha)}
                     onMouseLeave={() => setHoveredRow(null)}
@@ -193,6 +207,7 @@ export default function StaffCalendar() {
             </tbody>
           </table>
         </div>
+        )}
       </div>
     </div>
   );
