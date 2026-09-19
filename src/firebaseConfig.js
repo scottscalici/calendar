@@ -7,7 +7,7 @@ import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+const firebaseConfigOriginal = {
   apiKey: "AIzaSyCNjPpTu1g_8wc2sITS7M8Fqh7GZnueVKw",
   authDomain: "senorplus-1926c.firebaseapp.com",
   projectId: "senorplus-1926c",
@@ -18,7 +18,7 @@ const firebaseConfig = {
 };
 
 // --- PROJECT 2: New Database (Write/Read Notes) ---
-const firebaseConfig = {
+const firebaseConfigNotes = {
   apiKey: "AIzaSyAtGQHoI44yqVpmh8Ta2l2w6jjJJnL6Y3w",
   authDomain: "calendar-43052.firebaseapp.com",
   projectId: "calendar-43052",

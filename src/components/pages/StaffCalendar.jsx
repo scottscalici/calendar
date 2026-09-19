@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { doc, getDoc, setDoc, deleteDoc, collection, onSnapshot } from "firebase/firestore";
-import { db } from "../../firebaseConfig"; // Ensure this path is correct
+import { dbCalendar, dbNotes } from "../../firebaseConfig";
 
 export default function StaffCalendar() {
   const [calendarDays, setCalendarDays] = useState([]);
@@ -40,7 +40,7 @@ export default function StaffCalendar() {
 
   const fetchMasterCalendar = async () => {
     try {
-      const docRef = doc(db, "config", "academic_year_2026_2027");
+      const docRef = doc(dbCalendar, "config", "academic_year_2026_2027");
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
@@ -53,7 +53,7 @@ export default function StaffCalendar() {
   };
 
   const listenToStaffNotes = () => {
-    const notesRef = collection(db, "configNotes");
+    const notesRef = collection(dbNotes, "configNotes");
     onSnapshot(notesRef, (snapshot) => {
       const notesMap = {};
       snapshot.forEach((doc) => {
@@ -69,7 +69,7 @@ export default function StaffCalendar() {
       return;
     }
     try {
-      const noteRef = doc(db, "configNotes", dateId);
+      const noteRef = doc(dbNotes, "configNotes", dateId);
       await setDoc(noteRef, { noteText: editValue }, { merge: true });
       setEditingDate(null);
     } catch (error) {
@@ -79,7 +79,7 @@ export default function StaffCalendar() {
 
   const handleDeleteNote = async (dateId) => {
     try {
-      const noteRef = doc(db, "configNotes", dateId);
+      const noteRef = doc(dbNotes, "configNotes", dateId);
       await deleteDoc(noteRef);
       setEditingDate(null);
     } catch (error) {
