@@ -2,6 +2,12 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  # Firebase client API keys are not secrets (restricted via Firebase
+  # Security Rules / API key restrictions, not by hiding them), so exempt
+  # them from Netlify's secret scanner instead of failing the build.
+  SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIzaSyCNjPpTu1g_8wc2sITS7M8Fqh7GZnueVKw,AIzaSyAtGQHoI44yqVpmh8Ta2l2w6jjJJnL6Y3w"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
