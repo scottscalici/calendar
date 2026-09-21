@@ -28,13 +28,14 @@ export default function StaffCalendar() {
       const day = String(today.getDate()).padStart(2, '0');
       const todayStr = `${year}-${month}-${day}`;
 
-      const targetDay = calendarDays.find(d => d.fecha >= todayStr);
+      const sortedDays = [...calendarDays].sort((a, b) => a.fecha.localeCompare(b.fecha));
+      const targetDay = sortedDays.find(d => d.fecha >= todayStr) || sortedDays[sortedDays.length - 1];
 
       if (targetDay && rowRefs.current[targetDay.fecha]) {
         setTimeout(() => {
-          rowRefs.current[targetDay.fecha].scrollIntoView({ 
-            behavior: "smooth", 
-            block: "center" 
+          rowRefs.current[targetDay.fecha].scrollIntoView({
+            behavior: "auto",
+            block: "center"
           });
         }, 100);
       }
